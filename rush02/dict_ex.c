@@ -2,72 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct nlist { /* table entry: */
-    struct nlist *next; /* next entry in chain */
-    char *name; /* defined name */
-    char *defn; /* replacement text */
-};
-
-#define HASHSIZE 101
-static struct nlist *hashtab[HASHSIZE]; /* pointer table */
-
-/* hash: form hash value for string s */
-unsigned hash(char *s)
-{
-    unsigned hashval;
-    for (hashval = 0; *s != '\0'; s++)
-      hashval = *s + 31 * hashval;
-    return hashval % HASHSIZE;
-}
-
-/* lookup: look for s in hashtab */
-struct nlist *lookup(char *s)
-{
-    struct nlist *np;
-    for (np = hashtab[hash(s)]; np != NULL; np = np->next)
-        if (strcmp(s, np->name) == 0)
-          return np; /* found */
-    return NULL; /* not found */
-}
-
-char *ft_strdup(char *);
-/* install: put (name, defn) in hashtab */
-struct nlist *install(char *name, char *defn)
-{
-    struct nlist *np;
-    unsigned hashval;
-    if ((np = lookup(name)) == NULL) { /* not found */
-        np = (struct nlist *) malloc(sizeof(*np));
-        if (np == NULL || (np->name = ft_strdup(name)) == NULL)
-          return NULL;
-        hashval = hash(name);
-        np->next = hashtab[hashval];
-        hashtab[hashval] = np;
-    } else /* already there */
-        free((void *) np->defn); /*free previous defn */
-    if ((np->defn = ft_strdup(defn)) == NULL)
-       return NULL;
-    return np;
-}
-
-char *ft_strdup(char *s) /* make a duplicate of s */
-{
-    char *p;
-    p = (char *) malloc(strlen(s)+1); /* +1 for ’\0’ */
-    if (p != NULL)
-       strcpy(p, s);
-    return p;
-}
-
-/*
-    struct s_item {
-    int     number;
-    char    str[100];
-    } item;
-    item.number = 5;
-    strcpy(item.str,"String less than 100 chars");
-*/
-
 char* itoa(int value, char* result, int base) {
     // check that the base if valid
     if (base < 2 || base > 36) { *result = '\0'; return result; }
@@ -104,7 +38,7 @@ char *int2words(int num)
 		return (0);
 
     itoa(num, numstr, 10);
-    char d[28][2][15] = {
+    static const char d[28][2][15] = {
             "0", "zero", 
             "1", "one",
             "2", "two", 
@@ -139,7 +73,6 @@ char *int2words(int num)
     char *k[] = {"thousand", "thousand,"};
     char *m[] = {"million", "million,"};
     char *b[] = {"billion", "billion,"};
-    char *t[] = {"trillion", "trillion,"};
 
     int i = 0;
     if (num < 20)
@@ -202,9 +135,9 @@ char *int2words(int num)
     } 
 
     else {
-            char    *word1;
-            char    *word2;
-            long     divisor;
+            char        *word1;
+            char        *word2;
+            long        divisor; //unnecessarily huge
 
             if (num < 1000)
             {
@@ -227,26 +160,19 @@ char *int2words(int num)
                 word2 = m[1];
             }
             
-            else if (num < 1000000000000)
+            else
             {
                 divisor = 1000000000;
                 word1 = b[0];
                 word2 = b[1];
             }
-
-            /*else
-            {
-                divisor = 1000000000000;
-                word1 = t[1];
-                word2 = t[2];
-            }*/
-        
+   
         div = num / divisor;
         mod = num % divisor;
 
         if (mod == 0)
         {
-            strcat(buffer, int2words(div));
+            buffer = int2words(div);
             strcat(buffer, " ");
             strcat(buffer, word1);
             return (buffer);
@@ -254,33 +180,18 @@ char *int2words(int num)
             
         else
         {
-            strcat(buffer, int2words(div));
+            buffer = int2words(div);
             strcat(buffer, " ");
             strcat(buffer, word2);
             strcat(buffer, " ");
             strcat(buffer, int2words(mod));
             return (buffer);
         }
-            
-
-/*
-        //do something
-        if num < k[0]:
-            divisor, word1, word2 = h
-        elif num < m[0]:
-            divisor, word1, word2 = k
-        elif num < b[0]:
-            divisor, word1, word2 = m
-        elif num < t[0]:
-            divisor, word1, word2 = b
-        else:
-            divisor, word1, word2 = t
-            */
     }   
-    return (buffer);
+    return (buffer); //redundant
 }
 
 int main()
 {
-    printf(int2words(201));
+    printf(int2words(2021));
 }
