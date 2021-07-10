@@ -92,48 +92,54 @@ char* itoa(int value, char* result, int base) {
     return result;
 }
 
-int main()
+char *int2words(int num)
 {
-    char d[28][2][15] = {
-               "0", "zero", 
-               "1", "one",
-               "2", "two", 
-               "3", "three", 
-               "4", "four", 
-               "5", "five",
-               "6", "six", 
-               "7", "seven", 
-               "8", "eight", 
-               "9", "nine", 
-               "10", "ten",
-               "11", "eleven", 
-               "12", "twelve", 
-               "13", "thirteen", 
-               "14", "fourteen",
-               "15", "fifteen", 
-               "16", "sixteen", 
-               "17", "seventeen", 
-               "18", "eighteen",
-               "19", "nineteen", 
-               "20", "twenty",
-               "30", "thirty", 
-               "40", "forty", 
-               "50", "fifty", 
-               "60", "sixty",
-               "70", "seventy", 
-               "80", "eighty", 
-               "90", "ninety" 
-    };
-
-    char *h[] = {"100", "hundred", "hundred and"};
-    char *k[] = {"1000", "thousand", "thousand,"};
-    char *m[] = {"1000000", "million", "million,"};
-    char *b[] = {"1000000000", "billion", "billion,"};
-    char *t[] = {"1000000000000", "trillion", "trillion,"};
-
-    int num = 21;
+    char *buffer;
     char numstr[256];
+
+    int div;
+    int mod;
+
+	if ((buffer = (char *)malloc((256) * sizeof(char))) == NULL)
+		return (0);
+
     itoa(num, numstr, 10);
+    char d[28][2][15] = {
+            "0", "zero", 
+            "1", "one",
+            "2", "two", 
+            "3", "three", 
+            "4", "four", 
+            "5", "five",
+            "6", "six", 
+            "7", "seven", 
+            "8", "eight", 
+            "9", "nine", 
+            "10", "ten",
+            "11", "eleven", 
+            "12", "twelve", 
+            "13", "thirteen", 
+            "14", "fourteen",
+            "15", "fifteen", 
+            "16", "sixteen", 
+            "17", "seventeen", 
+            "18", "eighteen",
+            "19", "nineteen", 
+            "20", "twenty",
+            "30", "thirty", 
+            "40", "forty", 
+            "50", "fifty", 
+            "60", "sixty",
+            "70", "seventy", 
+            "80", "eighty", 
+            "90", "ninety" 
+};
+
+    char *h[] = {"hundred", "hundred and"};
+    char *k[] = {"thousand", "thousand,"};
+    char *m[] = {"million", "million,"};
+    char *b[] = {"billion", "billion,"};
+    char *t[] = {"trillion", "trillion,"};
 
     int i = 0;
     if (num < 20)
@@ -142,16 +148,16 @@ int main()
         {
             if (strcmp(numstr, d[i][0]) == 0)
             {
-                printf("%s\n", d[i][1]);
-                return (0);
+                strcpy(buffer, d[i][1]);
+                return(buffer);
             }
             i++;
         }
     }
     if (num < 100)
     {
-        int div = num / 10;
-        int mod = num % 10;
+        div = num / 10;
+        mod = num % 10;
 
         if (mod == 0)
         {
@@ -159,8 +165,8 @@ int main()
             {
                 if (strcmp(numstr, d[i][0]) == 0)
                 {
-                    printf("%s\n", d[i][1]);
-                    return (0);
+                    strcpy(buffer, d[i][1]);
+                    return(buffer);
                 }
                 i++;
             }
@@ -174,7 +180,7 @@ int main()
             {
                 if (strcmp(divstr, d[i][0]) == 0)
                 {
-                    printf("%s - ", d[i][1]);
+                    strcpy(buffer, d[i][1]);
                     break;
                 }
                 i++;
@@ -186,21 +192,79 @@ int main()
             {
                 if (strcmp(modstr, d[i][0]) == 0)
                 {
-                    printf("%s\n", d[i][1]);
-                    return (0);
+                    strcat(buffer, "-");
+                    strcat(buffer, d[i][1]);
+                    return (buffer);
                 }
                 i++;
             }
         }
-    }    
-    /*if num < 20:
-        return d[num]
-    if num < 100:
-        div_, mod_ = divmod(num, 10)
-            if mod_ == 0
-                return d[num]   
-            return d[div_ * 10] + '-' + d[mod_]
-    else:
+    } 
+
+    else {
+            char    *word1;
+            char    *word2;
+            long     divisor;
+
+            if (num < 1000)
+            {
+                divisor = 100;
+                word1 = h[0];
+                word2 = h[1];
+            }
+            
+            else if (num < 1000000)
+            {
+                divisor = 1000;
+                word1 = k[0];
+                word2 = k[1];
+            }
+
+            else if (num < 1000000000)
+            {
+                divisor = 1000000;
+                word1 = m[0];
+                word2 = m[1];
+            }
+            
+            else if (num < 1000000000000)
+            {
+                divisor = 1000000000;
+                word1 = b[0];
+                word2 = b[1];
+            }
+
+            /*else
+            {
+                divisor = 1000000000000;
+                word1 = t[1];
+                word2 = t[2];
+            }*/
+        
+        div = num / divisor;
+        mod = num % divisor;
+
+        if (mod == 0)
+        {
+            strcat(buffer, int2words(div));
+            strcat(buffer, " ");
+            strcat(buffer, word1);
+            return (buffer);
+        }
+            
+        else
+        {
+            strcat(buffer, int2words(div));
+            strcat(buffer, " ");
+            strcat(buffer, word2);
+            strcat(buffer, " ");
+            strcat(buffer, int2words(mod));
+            return (buffer);
+        }
+            
+
+/*
+        //do something
         if num < k[0]:
             divisor, word1, word2 = h
         elif num < m[0]:
@@ -211,10 +275,12 @@ int main()
             divisor, word1, word2 = b
         else:
             divisor, word1, word2 = t
-        div_, mod_ = divmod(num, divisor)
-        if mod_ == 0:
-            return '{} {}'.format(int2words(div_), word1)
-        else:
-            return '{} {} {}'.format(int2words(div_), word2, int2words(mod_))
-*/
+            */
+    }   
+    return (buffer);
+}
+
+int main()
+{
+    printf(int2words(201));
 }
